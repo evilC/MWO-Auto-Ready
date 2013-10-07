@@ -1,4 +1,4 @@
-﻿; MWO Intelligent Zoom
+﻿; MWO Ready
 
 ; Create an instance of the library
 ADHD := New ADHDLib
