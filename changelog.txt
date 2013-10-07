@@ -1,0 +1,76 @@
+MWO Intelligent Zoom changelog
+
+Key:
+! : Warning
+* : Comment
+= : Change / Fix
++ : Added feature
+
+2.3 30th Aug 2013
+= Improved reliability - sometimes 3.0x would be mis-detected as 1.0x.
+  The script now knows what zoom to expect next after a keypress.
+  If it detects a zoom other than expected, it re-tries to verify before re-issuing another zoom.
+  eg, before if you were at 1.5x, and zoomed in, if it thought it detected 1.0x after you zoomed in, it would hit zoom again.
+  Now, it knows to expect 1.5x next, and if it fails to detect 1.5x three times in a row, gives up without hitting zoom again.
++ Much more info now displayed in debug mode.
+
+  
+2.2 29th Aug 2013
++ Added "Monitor" readout to monitor value of stick input for head tracking.
+  Should allow users to find the correct stick ID / Axis, and also help debugging
+
+2.1 29th Aug 2013
++ Experimental head tracking support.
+  Allows you to control zoom by leaning closer to the screen.
+  Requires EITHER:
+  TrackIR (In Joystick Emulation Mode)
+  OR
+  FaceTrackNoIR (Free) plus a supported Webcam (Default settings, set "Game Protocol" to "vJoy")
+  Then choose the axis that represents lean (Z axis) in the Zoom GUI
+
+2.0 29th Aug 2013
+= Completely redesigned logic.
+  The pixel detection routine is the same, but that is about it.
+  New technique finds out what zoom you are in when you hit zoom...
+  ...then hits zoom and waits until it sees the next expected zoom before sending any more zooms.
+  Should be much more reliable.
+
+1.10 28th Aug 2013
+= Fixed newly introduced bug where it would retry zoom indefinitely if it failed to detect zoom rate
+
+1.9 28th Aug 2013
+= Tweaks to max zoom mode for reliability.
++ If zoom is attempted but it cannot detect pixels, it tries again up to 3 times
++ Option to play debug sounds. This should help me solve reliability issues.
+
+1.8 28th Aug 2013
++ Max Zoom option is now a dropdown - Normal / Max Zoom / Toggle Min/Max
+  Use the Toggle Min/Max feature to only need one button to toggle between min and max zoom
+
+1.7 28th Aug 2013
++ Further tweaks to max zoom mode
+
+1.6 28th Aug 2013
++ Fixed max zoom - was only working in Testing Grounds
+
+1.5 28th Aug 2013
++ Added "Max Zoom Only" setting - Enable to only use 3x zoom (skip 1.5x zoom)
+
+1.4 27th Aug 2013
++ Default settings should now work for 1080p (1920x1080)
++ Added "Zoom repeat delay" to help tune for wider FOVs, slower machines etc.
+
+1.3 27th Aug 2013
+= Much improved input handling
+  Now if you roll spam zoom in (ie roll the mouse wheel up multiple times) it will queue zoom ins nicely
+  ie two Wheel Ups in rapid succession should now reliably zoom in to full
+  Also issues with the script getting confused in cases like this seem to be improved
+
+1.2 27th Aug 2013
+= Messed with timings
+
+1.1 27th Aug 2013
++ Added Homepage Link
+
+1.0 27th Aug 2013
+* Initial Release
