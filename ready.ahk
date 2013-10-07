@@ -12,8 +12,9 @@ ADHD.run_as_admin()
 #MaxHotkeysPerInterval 999
 
 ; Set up vars
-calibrated := 0
+;calibrated := 0
 heartbeat_ready := 0
+heartbeat_on := 0
 
 ; ============================================================================================
 ; CONFIG SECTION - Configure ADHD
@@ -24,18 +25,19 @@ SetKeyDelay, 0, 50
 
 ; Stuff for the About box
 
-ADHD.config_about({name: "MWO Ready", version: 0.1, author: "evilC", link: "<a href=""http://mwomercs.com/forums/topic/"">LINK! Homepage</a>"})
+ADHD.config_about({name: "MWO Ready", version: 1.0, author: "evilC", link: "<a href=""http://mwomercs.com/forums/topic/138777-"">Homepage</a>"})
 ; The default application to limit hotkeys to.
 ; Starts disabled by default, so no danger setting to whatever you want
 ADHD.config_default_app("CryENGINE")
 
 ; GUI size
-ADHD.config_size(375,200)
+ADHD.config_size(375,230)
 
 ; Defines your hotkeys 
 ; subroutine is the label (subroutine name - like MySub: ) to be called on press of bound key
 ; uiname is what to refer to it as in the UI (ie Human readable, with spaces)
 ADHD.config_hotkey_add({uiname: "Calibrate", subroutine: "Calibrate"})
+ADHD.config_hotkey_add({uiname: "Auto Ready", subroutine: "AutoReady"})
 
 ; Hook into ADHD events
 ; First parameter is name of event to hook into, second parameter is a function name to launch on that event
@@ -67,6 +69,8 @@ Gui, Add, Text, xp+50 yp+2 W20 center vReadyOnColSwatch, ■
 Gui, Add, Text, x5 yp+45, Status
 ADHD.gui_add("DropDownList", "ReadyStatus", "xp+50 yp-2 W50", "Off||On", "Off")
 
+ADHD.gui_add("CheckBox", "PlayDebugBeeps", "x5 yp+25", "Play Debug Beeps", 0)
+
 ; End GUI creation section
 ; ============================================================================================
 
@@ -79,19 +83,24 @@ Calibrate:
 	; Detect mouse position
 	MouseGetPos, mouse_x, mouse_y
 	
-	; Pixel below mouse should be "Not Ready" colour
-	PixelGetColor, ready_off_colour, mouse_x, mouse_y, RGB
+	; Move cursor out of way
+	MouseMove, 0, 50,, R
+	Sleep, 100
+	
+	; Pixel at coords specified should be "Not Ready" colour
+	PixelGetColor, ready_off_colour, %mouse_x%, %mouse_y%, RGB
 	; Remove 0x from start
 	ready_off_colour := SubStr(ready_off_colour, 3)
 	
-	; Click mouse
-	Click
+	; Click Ready button
+	Click %mouse_x%, %mouse_y%
 	
-	; Wait a little
+	; Move the mouse away again
+	MouseMove, 0, 50,, R
 	Sleep, 100
 	
 	; Find new "Ready" colour
-	PixelGetColor, ready_on_colour, mouse_x, mouse_y, RGB
+	PixelGetColor, ready_on_colour, %mouse_x%, %mouse_y%, RGB
 	; Remove 0x from start
 	ready_on_colour := SubStr(ready_on_colour, 3)
 		
@@ -107,6 +116,14 @@ Calibrate:
 	
 	return
 
+AutoReady:
+	if (heartbeat_on){
+		heartbeat_stop()
+	} else {
+		heartbeat_start()
+	}
+	return
+	
 update_swatches(){
 	global ReadyOffCol
 	global ReadyOnCol
@@ -124,30 +141,51 @@ update_swatch(swatch, col){
 }
 	
 Heartbeat:
-	PixelGetColor, tmp, ReadyX, ReadyY, RGB
 	col := "0x" ReadyOffCol
+	/*
+	PixelSearch, outx, outy, %ReadyX%, %ReadyY%, %ReadyX%, %ReadyY%, %col% , 100, Fast RGB
+	if Errorlevel {
+		tmp := 0
+	} else {
+		tmp := col
+	}
+	*/
+	PixelGetColor, tmp, %ReadyX%, %ReadyY%, RGB
 	if (tmp == col){
 		if (heartbeat_ready){
-			Click, %ReadyX%, %ReadyY%
+			Click %ReadyX%, %ReadyY%
+			MouseMove, 0, 50,, R
+			; Sleep to wait for colour to change
 			Sleep, 1000
-			PixelGetColor, tmp, ReadyX, ReadyY, RGB
+			PixelGetColor, tmp, %ReadyX%, %ReadyY%, RGB
 			col := "0x" ReadyOnCol
 			if (tmp == col){
-				soundbeep, 800, 100
+				if (PlayDebugBeeps){
+					soundbeep, 800, 100
+				}
 				ADHD.debug("Heartbeat detected good ready")
+				;Send, tglhf
+				Send {Enter}
 			} else {
-				soundbeep, 500, 100
+				if (PlayDebugBeeps){
+					soundbeep, 500, 1000
+				}
 				ADHD.debug("Heartbeat detected bad ready?")
 			}
 			heartbeat_stop()
 		} else {
 			ADHD.debug("Heartbeat detected ready button, waiting for stability...")
+			if (PlayDebugBeeps){
+				soundbeep, 600, 100
+			}
 			heartbeat_ready := 1
-			Sleep, 1000
-			Gosub, Heartbeat
+			
 		}
 	} else {
-		ADHD.debug("Heartbeat did not detect Ready button")
+		;ADHD.debug("Heartbeat did not detect Ready button")
+		if (PlayDebugBeeps){
+			soundbeep, 500, 100
+		}
 	}
 	return
 
@@ -156,31 +194,37 @@ TimeOut:
 
 	heartbeat_stop()
 	return
-	
+
 heartbeat_start(){
 	global heartbeat_ready
+	global heartbeat_on
 	
 	ADHD.debug("Starting Heartbeat")
 	
 	heartbeat_ready := 0
+	heartbeat_on := 1
 	SetTimer, Heartbeat, 1000
-	SetTimer, TimeOut, 60000
+	SetTimer, TimeOut, 80000
 	return
 }
 	
 heartbeat_stop(){
-	SetTimer, Heartbeat, Off
+	global heartbeat_on
 
+	SetTimer, Heartbeat, Off
+	SetTimer, TimeOut, Off
+	
+	heartbeat_on := 0
 	ADHD.debug("Stopping Heartbeat")
 	return
 }
 	
 app_active_hook(){
-	
+	return
 }
 
 app_inactive_hook(){
-
+	return
 }
 
 option_changed_hook(){
@@ -208,24 +252,28 @@ option_changed_hook(){
 resolution_changed_hook(){
 	global ADHD
 	global ReadyStatus
-	
+
+	/*
 	Winget, tmp, MinMax
 	ADHD.debug("winget reports " tmp)
 	if (tmp == -1){
 		return
 	}
+	*/
+	
 	curr_size := ADHD.limit_app_get_size()
 	last_size := ADHD.limit_app_get_last_size()
 	ADHD.debug("Res change: " last_size.w "x" last_size.h " --> " curr_size.w "x" curr_size.h )
 	if (curr_size.w > last_size.w || curr_size.h > last_size.h){
 		; Got larger - lobby to game
-		ADHD.debug("MWOReady: Res got bigger")
+		ADHD.debug("MWOReady: Res got bigger. Mechlab -> Game")
 		if (ReadyStatus == "On"){
+			ADHD.debug("MWOReady: Starting heartbeat")
 			heartbeat_start()
 		}
 	} else if (curr_size.w < last_size.w || curr_size.h < last_size.h) {
 		; Got smaller game to lobby
-		ADHD.debug("MWOReady: Res got smaller")
+		ADHD.debug("MWOReady: Res got smaller. Game -> Mechlab")
 		
 		; Just in case...
 		heartbeat_stop()
