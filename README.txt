@@ -41,18 +41,27 @@ The match should start as normal.
 
 When you return to mechlab, the boxes on the main tab should be filled out, and the Status box enabled.
 
+
 Step 3: NORMAL USAGE
 ====================
-
 Make sure the Status dropdown on the Main tab is set to "On".
 
 Start a game. The app should automatically detect the transition from mechlab to game (Window size gets bigger) and auto-trigger.
 
 If it does not, or it does and you do not want it to, you can manually turn it on or off with CTRL+ALT+R
 
+
+OPTIONAL SCREEN RECORDING START
+===============================
+This feature will automatically start your Screen Capture software after readying up.
+It will hit ALT+F9 (Default for nVidia ShadowPlay) after a pre-determined delay (Default 20 secs)
+
+If using ShadowPlay, you would need to set recording mode to "Manual".
+As of time of writing, the ShadowPlay beta is limited to 4GB file sizes (Roughly 10 mins at high quality).
+If you wish to capture a full match, you may need to set Quality to "Medium".
+
 ADVANCED
 =========
-
 For optimal usage, you may want to position the mouse over the white of the word "Ready" when you calibrate.
 This should result in the app being able to reliably detect a good ready when the text changes colour.
 

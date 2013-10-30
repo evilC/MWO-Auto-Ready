@@ -8,3 +8,8 @@ Key:
 
 1.0 7th Oct 2013
 * Initial Release
+
+1.1 30th Oct 2013
++ Added option to automatically start capturing gameplay using nVidia ShadowPlay.
+  Other screen capture programs could be used, as long as you set the recording hotkey to ALT+F9
+  Start of screen capture can be sent after a specified duration (Default is 20 seconds)

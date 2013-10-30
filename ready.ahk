@@ -25,7 +25,7 @@ SetKeyDelay, 0, 50
 
 ; Stuff for the About box
 
-ADHD.config_about({name: "MWO Ready", version: 1.0, author: "evilC", link: "<a href=""http://mwomercs.com/forums/topic/138777-"">Homepage</a>"})
+ADHD.config_about({name: "MWO Ready", version: 1.1, author: "evilC", link: "<a href=""http://mwomercs.com/forums/topic/138777-"">Homepage</a>"})
 ; The default application to limit hotkeys to.
 ; Starts disabled by default, so no danger setting to whatever you want
 ADHD.config_default_app("CryENGINE")
@@ -70,6 +70,10 @@ Gui, Add, Text, x5 yp+45, Status
 ADHD.gui_add("DropDownList", "ReadyStatus", "xp+50 yp-2 W50", "Off||On", "Off")
 
 ADHD.gui_add("CheckBox", "PlayDebugBeeps", "x5 yp+25", "Play Debug Beeps", 0)
+
+ADHD.gui_add("CheckBox", "EnableAutoRecord", "x5 yp+25", "Enable Auto Screen Capture (ALT+F9) after", 0)
+ADHD.gui_add("Edit", "RecordDelay", "xp+230 yp-2 W40", "", "20")
+Gui, Add, Text, xp+45 yp+2, seconds
 
 ; End GUI creation section
 ; ============================================================================================
@@ -164,8 +168,11 @@ Heartbeat:
 					soundbeep, 800, 100
 				}
 				ADHD.debug("Heartbeat detected good ready")
-				;Send, tglhf
-				Send {Enter}
+				if (EnableAutoRecord){
+					tmp := RecordDelay * 1000
+					Sleep, %tmp%
+					Send !{F9}
+				}
 			} else {
 				if (PlayDebugBeeps){
 					soundbeep, 500, 1000
