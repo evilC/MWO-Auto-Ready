@@ -25,7 +25,7 @@ SetKeyDelay, 0, 50
 
 ; Stuff for the About box
 
-ADHD.config_about({name: "MWO Ready", version: 1.1, author: "evilC", link: "<a href=""http://mwomercs.com/forums/topic/138777-"">Homepage</a>"})
+ADHD.config_about({name: "MWO Ready", version: 1.2, author: "evilC", link: "<a href=""http://mwomercs.com/forums/topic/138777-"">Homepage</a>"})
 ; The default application to limit hotkeys to.
 ; Starts disabled by default, so no danger setting to whatever you want
 ADHD.config_default_app("CryENGINE")
@@ -155,6 +155,7 @@ Heartbeat:
 	}
 	*/
 	PixelGetColor, tmp, %ReadyX%, %ReadyY%, RGB
+	ADHD.debug("Heartbeat detected color " tmp)
 	if (tmp == col){
 		if (heartbeat_ready){
 			Click %ReadyX%, %ReadyY%
